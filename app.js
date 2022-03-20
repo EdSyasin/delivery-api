@@ -10,9 +10,10 @@ app.use(require('express-session')({
     secret: config.secret,
     resave: false,
     saveUninitialized: false,
+    cookie: { secure: false }
 }));
-app.use(passport.initialize());
-app.use(passport.session())
+app.use(passport.initialize(undefined));
+app.use(passport.session(undefined))
 
 app.use('/api', require('./routers/user'));
 

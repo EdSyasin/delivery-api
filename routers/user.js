@@ -3,6 +3,20 @@ const userModule = require('../models/user');
 const crypto = require('crypto');
 const passport = require('../services/passport');
 
+router.get('/user', (request, response) => {
+    if (request.isAuthenticated()) {
+        return response.json({
+            status: 'ok',
+            data: request.user
+        })
+    } else {
+        return response.status(401).json({
+            status: 'error',
+            error: 'Неавторизован'
+        })
+    }
+})
+
 router.post('/signup', async (request, response) => {
     const { email, password, name, contactPhone } = request.body;
     if (!email || !password || !name ) {
@@ -34,10 +48,12 @@ router.post('/signin', async (request, response) => {
             })
         }
         if (user) {
-           return response.json({
-               status: 'ok',
-               data: user
-           });
+            request.login(user, () => {
+                return response.json({
+                    status: 'ok',
+                    data: user
+                });
+            })
         } else {
             return response.status(401).json({
                 status: "error",
