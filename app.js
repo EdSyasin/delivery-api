@@ -3,8 +3,17 @@ const app = require('express')();
 const server = require('http').createServer(app);
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const passport = require('./services/passport');
 
 app.use(bodyParser.json());
+app.use(require('express-session')({
+    secret: config.secret,
+    resave: false,
+    saveUninitialized: false,
+}));
+app.use(passport.initialize());
+app.use(passport.session())
+
 app.use('/api', require('./routers/user'));
 
 (async () => {
