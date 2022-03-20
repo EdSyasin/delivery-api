@@ -28,7 +28,7 @@ passport.serializeUser((user, cb) => {
 passport.deserializeUser(async (id, cb) => {
     const user = await userModule.findById(id);
     if (!user) {
-       return cb('Пользователь не найден')
+       return cb(null, false, 'Пользователь не найден')
     }
     return cb(null, user)
 });
