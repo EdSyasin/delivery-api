@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const passport = require('./services/passport');
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(require('express-session')({
     secret: config.secret,
     resave: false,
@@ -16,6 +17,7 @@ app.use(passport.initialize(undefined));
 app.use(passport.session(undefined))
 
 app.use('/api', require('./routers/user'));
+app.use('/api', require('./routers/advertisement'));
 
 (async () => {
     try {
