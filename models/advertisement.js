@@ -8,7 +8,9 @@ const advertisement = {
     },
 
     async list(){
-        const advertisements = await AdvertisementModel.find().populate('user', ['id', 'name']);
+        const advertisements = await AdvertisementModel
+            .find({ isDeleted: false })
+            .populate('user', ['id', 'name']);
         return advertisements;
     },
 
@@ -18,7 +20,7 @@ const advertisement = {
      * @returns {Promise<Query<any, any, {}, any>|null>}
      */
     async findById(id) {
-        const advertisement = await AdvertisementModel.findById(id);
+        const advertisement = await AdvertisementModel.findOne({_id: id, isDeleted: false}).populate('user', ['id', 'name']);
         return advertisement || null;
     },
 
@@ -33,6 +35,7 @@ const advertisement = {
             return false;
         } else {
             advertisement.isDeleted = true;
+            await advertisement.save()
             return true;
         }
     }
