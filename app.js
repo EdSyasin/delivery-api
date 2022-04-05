@@ -4,6 +4,10 @@ const server = require('http').createServer(app);
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const passport = require('./services/passport');
+const io = require('socket.io');
+const socket = require('./socket');
+
+const socketIo = io(server);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -16,8 +20,12 @@ app.use(require('express-session')({
 app.use(passport.initialize(undefined));
 app.use(passport.session(undefined))
 
+app.use(socket(socketIo))
+
 app.use('/api', require('./routers/user'));
 app.use('/api', require('./routers/advertisement'));
+
+
 
 (async () => {
     try {
