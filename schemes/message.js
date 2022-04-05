@@ -8,7 +8,8 @@ const MessageSchema = new Schema({
     },
     sendAt: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     },
     text: {
         type: String,
@@ -19,4 +20,4 @@ const MessageSchema = new Schema({
     },
 });
 
-module.exports = model('Message ', MessageSchema);
+module.exports = MessageSchema;

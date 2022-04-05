@@ -1,43 +1,53 @@
-const AdvertisementModel = require('../schemes/advertisement')
+const ChatModel = require('../schemes/chat')
 
-const advertisement = {
-    async create(data) {
-        const newAdvertisement = new AdvertisementModel(data);
-        await newAdvertisement.save();
-        return newAdvertisement;
+const subscriptions = []
+
+const chat = {
+    async find(users) {
+        const chat = await ChatModel.findOne({users: {$all: users}}).populate('messages');
+        return chat || null;
     },
 
-    async list(){
-        return AdvertisementModel
-            .find({isDeleted: false})
-            .populate('user', ['id', 'name']);
+    async getHistory (id) {
+        return ChatModel.findById(id).select('-_id messages').populate('messages.author');
     },
 
-    /**
-     *
-     * @param id {string}
-     * @returns {Promise<Query<any, any, {}, any>|null>}
-     */
-    async findById(id) {
-        const advertisement = await AdvertisementModel.findOne({_id: id, isDeleted: false}).populate('user', ['id', 'name']);
-        return advertisement || null;
-    },
+    async sendMessage (data) {
+        console.log(data)
+        const { author, receiver, text } = data;
+        const currentDate = new Date().toISOString();
 
-    /**
-     *
-     * @param id {string}
-     * @returns {Promise<boolean>}
-     */
-    async remove(id) {
-        const advertisement = await AdvertisementModel.findById(id);
-        if (!advertisement) {
-            return false;
-        } else {
-            advertisement.isDeleted = true;
-            await advertisement.save()
-            return true;
+        try {
+            const chat = await ChatModel.findOne({ users: { $all: [author, receiver] } });
+            if (chat) {
+                await ChatModel.findOneAndUpdate(
+                    { _id: chat._id },
+                    {
+                        $push: {
+                            messages: { author, text, sentAt: currentDate },
+                        },
+                    },
+                    { returnDocument: 'after' }
+                );
+            } else {
+                await ChatModel.create({
+                    users: [author, receiver],
+                    text,
+                    createdAt: currentDate,
+                    messages: [{ author, text, sentAt: currentDate }],
+                });
+            }
+            const message = { author: author, text };
+            subscriptions.forEach((cb) => cb(chat._id, message));
+        } catch(error) {
+            console.log(error);
+            return null;
         }
+    },
+
+    subscribe(callback) {
+        subscriptions.push(callback)
     }
 }
 
-module.exports = advertisement
+module.exports = chat

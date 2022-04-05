@@ -8,10 +8,9 @@ const advertisement = {
     },
 
     async list(){
-        const advertisements = await AdvertisementModel
-            .find({ isDeleted: false })
+        return AdvertisementModel
+            .find({isDeleted: false})
             .populate('user', ['id', 'name']);
-        return advertisements;
     },
 
     /**
