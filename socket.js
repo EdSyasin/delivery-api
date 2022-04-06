@@ -3,7 +3,6 @@ const chatController = require('./models/chat')
 module.exports = (io) => (req, res, next) => {
     io.on('connection', (socket) => {
         console.log('Socket connection!');
-        const { id } = socket;
 
         const subCallback = async (chatId, message) => {
             console.log('subscriber emit', message);

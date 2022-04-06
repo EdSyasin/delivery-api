@@ -1,0 +1,27 @@
+version: "3.5"
+
+services:
+
+  delivery-api:
+    build: .
+    image: delivery-api
+    container_name: library-api
+    ports:
+      - 8082:3001
+    restart: on-failure
+    depends_on:
+      - mongodb
+    environment:
+      - "MONGO_HOST=mongodb"
+      - "MONGO_PORT=27017"
+      - "MONGO_DB=delivery"
+      - "MONGO_USER=${DB_USERNAME:-root}"
+      - "MONGO_PASSWORD=${DB_PASSWORD:-password}"
+
+  mongodb:
+    image: mongo
+    restart: always
+    environment:
+      - "MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME:-root}"
+      - "MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD:-password}"
+      - "MONGO_INITDB_DATABASE=delivery"
