@@ -1,6 +1,6 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const userModule = require('../models/User');
+const userModule = require('../models/user');
 const crypto = require('crypto');
 
 async function verify(email, password, done) {
